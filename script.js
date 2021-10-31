@@ -31,6 +31,8 @@ const restartGame = () => {
   // set all the boxes on the screen back to empty - remove any "X" or "0"'s.
   for (let box of boxes) {
     box.innerText = "";
+    box.classList.remove("box-o");
+    box.classList.remove("box-x");
   }
 
   playText.innerHTML = `Let's Play!!`;
