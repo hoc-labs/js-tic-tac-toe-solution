@@ -3,11 +3,6 @@
 // converted to an array of html DOM elements
 const boxes = Array.from(document.getElementsByClassName("box"));
 
-// used to keep track of which boxes have which symbol X or 0
-// there are nine spaces, representing the 3x3 grid
-// they will be initialized in initGame
-let spaces = [null, null, null, null, null, null, null, null, null];
-
 // one player is "X" and the other is "0". 
 // current player is either "X" or "0" and is what will be placed in the
 // box when the current player plays his turn.
@@ -23,14 +18,12 @@ let inPlay = true;
 const playText = document.getElementById("playText");
 
 const restartGame = () => {
-  // set all spaces back to blank
-  spaces = [null, null, null, null, null, null, null, null, null];
 
   inPlay = true;
 
   // set all the boxes on the screen back to empty - remove any "X" or "0"'s.
   for (let box of boxes) {
-    box.innerText = "";
+    setBoxText(box, '');
     box.classList.remove("box-o");
     box.classList.remove("box-x");
   }
@@ -41,9 +34,17 @@ const restartGame = () => {
   currentPlayer = O_TEXT;
 }
 
+function setBoxText(box, text) {
+  box.innerText=text;
+}
+
+function getBoxText(box) {
+  return box.innerText;
+}
+
 function emptySquaresLeft() {
-  for (let space of spaces) {
-    if (space===null) {
+  for (let box of boxes) {
+    if (box.innerText==='') {
       return true;
     }
   }
@@ -51,16 +52,19 @@ function emptySquaresLeft() {
   return false;
 }
 
+function boxIsEmpty(box) {
+  return box.innerText==='';
+}
+
 function onClickBox(event) {
   if (!inPlay) {
     return;
   }
 
-  const id = parseInt(event.target.id);
-  if (!spaces[id]) {
-    spaces[id] = currentPlayer;
-    event.target.innerText = currentPlayer;
-    event.target.classList.add(currentPlayer === O_TEXT?'box-o':'box-x');
+  const boxEl = event.target;
+  if (boxIsEmpty(boxEl)) {
+    setBoxText(boxEl, currentPlayer);
+    boxEl.classList.add(currentPlayer === O_TEXT?'box-o':'box-x');
     if (hasPlayerWon(currentPlayer)) {
       inPlay = false;
       playText.innerText = `${currentPlayer} wins!!`;
@@ -68,6 +72,7 @@ function onClickBox(event) {
     }
     
     if (!emptySquaresLeft()) {
+      inPlay = false;
       playText.innerText = "It's a draw!";
       return;
     }
@@ -76,9 +81,9 @@ function onClickBox(event) {
 }
 
 function threeInARow(first, second, third, player) {
-  return (spaces[first]  === player && 
-          spaces[second] === player && 
-          spaces[third]  === player);
+  return (getBoxText(boxes[first])  === player && 
+          getBoxText(boxes[second]) === player && 
+          getBoxText(boxes[third] ) === player);
 }
 
 function hasPlayerWon(player) {
